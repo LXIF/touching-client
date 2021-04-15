@@ -4,7 +4,6 @@
 
 <script>
 
-
 export default {
   name: 'App',
 }
@@ -13,4 +12,9 @@ export default {
 <style lang="stylus">
   :root
     font-family font-main
+    background-color #000
+  
+  body
+    margin 0
+    color color-light
 </style>

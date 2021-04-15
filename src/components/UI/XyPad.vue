@@ -1,14 +1,16 @@
 <template>
     <div class='xy-pad'>
-        <svg id='xy-pad' @mousedown='startSetCirclePosition' @mouseup='endSetCirclePosition' @mousemove='setCirclePosition' viewBox='0 0 100 100'>
-            <circle :cx='touchX' :cy='touchY' r='10' stroke='black'></circle>
+        <svg id='xy-pad' @pointerdown='startSetCirclePosition' @pointermove.prevent='setCirclePosition' viewBox='0 0 100 100'>
+            <circle class='xy-point' v-for='(user, index) in users' :key='index' :cx='user.position.x' :cy='user.position.y' r='1' />
+            <circle class='xy-cursor' :cx='touchX' :cy='touchY' :r='presenceRadius'></circle>
         </svg>
     </div>
 </template>
 
 <script>
 export default {
-    emits: ['position'],
+    emits: ['presence'],
+    props: ['users', 'radius'],
     data() {
         return {
             touchX: 50,
@@ -16,9 +18,23 @@ export default {
             touching: false
         }
     },
+    computed: {
+        presenceRadius() {
+            const min = 3;
+            const max = 50;
+            return this.radius / 100 * max + min;
+        }
+    },
     methods: {
-        startSetCirclePosition() {
+        startSetCirclePosition(e) {
             this.touching = true;
+            this.setCirclePosition(e);
+            const that = this;
+            function handlePointerup() {
+                that.endSetCirclePosition();
+                document.querySelector('html').removeEventListener('pointerup', handlePointerup);
+            }
+            document.querySelector('html').addEventListener('pointerup', handlePointerup);
         },
         endSetCirclePosition() {
             this.touching = false;
@@ -29,19 +45,30 @@ export default {
                 const padWidth = xyPad.clientWidth;
                 const padHeight = xyPad.clientHeight;
 
-                const newX = e.offsetX / padWidth * 100;
-                const newY = e.offsetY / padHeight * 100;
+                let newX = e.offsetX / padWidth * 100;
+                let newY = e.offsetY / padHeight * 100;
+
+                if (newX > 100) {
+                    newX = 100;
+                }
+                if (newX < 0) {
+                    newX = 0;
+                }
+                if (newY > 100) {
+                    newY = 100;
+                }
+                if (newY < 0) {
+                    newY = 0;
+                }
 
                 this.touchX = newX;
                 this.touchY = newY;
-                this.$emit('position', {
+                this.$emit('presence', {
                         x: newX,
-                        y: newY
+                        y: newY,
+                        radius: this.presenceRadius
                     });
             }
-        },
-        drag(e) {
-            console.log(e);
         }
     }
 }
@@ -49,11 +76,19 @@ export default {
 
 <style lang="stylus" scoped>
     .xy-pad
-        width 300px
-        height 300px
-        border 1px solid green
+        // width 300px
+        // height 300px
+        border 1px solid color-medium-light
         border-radius 10px
+        touch-action none
 
+    .xy-cursor
+        stroke color-medium-light
+        fill transparent
+
+    .xy-point
+        stroke red
+        fill red
     svg
         height inherit
         width inherit
