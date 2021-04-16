@@ -15,7 +15,9 @@ export default {
         return {
             touchX: 50,
             touchY: 50,
-            touching: false
+            touching: false,
+            offsetX: 0,
+            offsetY: 0
         }
     },
     computed: {
@@ -23,6 +25,11 @@ export default {
             const min = 3;
             const max = 50;
             return this.radius / 100 * max + min;
+        }
+    },
+    watch: {
+        radius() {
+            this.setRadius();
         }
     },
     methods: {
@@ -64,11 +71,18 @@ export default {
                 this.touchX = newX;
                 this.touchY = newY;
                 this.$emit('presence', {
-                        x: newX,
-                        y: newY,
+                        x: this.touchX,
+                        y: this.touchY,
                         radius: this.presenceRadius
                     });
             }
+        },
+        setRadius() {
+            this.$emit('presence', {
+                        x: this.touchX,
+                        y: this.touchY,
+                        radius: this.presenceRadius
+                    });
         }
     }
 }

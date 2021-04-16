@@ -1,20 +1,29 @@
 <template>
     <div class='fader-container'>
-        <svg id='fader' class='fader' @pointerdown='startSetFaderPosition' @pointermove.prevent='setFaderPosition' viewBox='0 0 100 10'>
-            <circle class='fader-knob' :cx='modelValue' cy='5' r='5'></circle>
+        <svg id='fader' class='fader' :class="{red: !rainbow, rainbow: rainbow}" @pointerdown='startSetFaderPosition' @pointermove.prevent='setFaderPosition' viewBox='0 0 100 10'>
+            <circle class='fader-knob' :cx='valuePos' cy='5' r='5'></circle>
         </svg>
     </div>
 </template>
 
 <script>
 export default {
-    props: ['orientation', 'modelValue'],
+    props: ['orientation', 'modelValue', 'scale', 'rainbow'],
 
     emits: ['update:modelValue'],
     data() {
         return {
             value: 0,
             touching: false
+        }
+    },
+    computed: {
+        valuePos() {
+            if(this.scale && this.scale !== 100) {
+                return this.modelValue / (this.scale / 100);
+            } else {
+                return this.modelValue
+            }
         }
     },
     methods: {
@@ -55,6 +64,10 @@ export default {
 
                 // this.value = newX;
                 // this.touchY = newY;
+                
+                if(this.scale && this.scale !== 100) {
+                        newX = newX * (this.scale / 100);
+                }
                 this.$emit('update:modelValue', newX);
             }
         }
@@ -65,11 +78,36 @@ export default {
 <style lang="stylus" scoped>
     .fader
         stroke red
-        background red
         // height 20px
         // width 100%
         border-radius 20px
         touch-action none
+
+    .red
+        background red
+    
+    .rainbow
+        background linear-gradient(to right,
+            hsl(0, 100, 50),
+            hsl(20, 100, 50),
+            hsl(40, 100, 50),    
+            hsl(60, 100, 50),
+            hsl(80, 100, 50),
+            hsl(100, 100, 50),
+            hsl(120, 100, 50),
+            hsl(140, 100, 50),
+            hsl(160, 100, 50),
+            hsl(180, 100, 50),
+            hsl(200, 100, 50),
+            hsl(220, 100, 50),
+            hsl(240, 100, 50),
+            hsl(260, 100, 50),
+            hsl(280, 100, 50),
+            hsl(300, 100, 50),
+            hsl(320, 100, 50),
+            hsl(340, 100, 50),
+            hsl(360, 100, 50)
+            )
     
     .fader-knob
         height 20px

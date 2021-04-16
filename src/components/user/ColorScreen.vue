@@ -18,12 +18,16 @@ export default {
         lightness: {
             type: Number,
             default: 0
+        },
+        alpha: {
+            type: Number,
+            default: 1
         }
     },
     computed: {
         screenStyle() {
             return `
-                background-color: hsl(${this.hue}, ${this.saturation}%, ${this.lightness}%);
+                background-color: hsla(${this.hue}, ${this.saturation}%, ${this.lightness}%, ${this.alpha});
             `
         }
     }

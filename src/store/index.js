@@ -17,6 +17,12 @@ const store = createStore({
                 y: 0,
                 radius: 3
             },
+            weather: {
+                hue: 0,
+                saturation: 0,
+                lightness: 0,
+                alpha: 0
+            },
             users: [],
             rafals: [],
             andris: []
@@ -31,9 +37,10 @@ const store = createStore({
             state.position.y = payload.y;
         },
         setPresence(state, payload) {
-            state.presence.x = payload.x;
-            state.presence.y = payload.y;
-            state.presence.radius = payload.radius;
+            state.presence = payload;
+        },
+        setWeather(state, payload) {
+            state.weather = payload;
         },
         updateUsers(state, payload) {
             state.users = payload;
@@ -60,9 +67,15 @@ const store = createStore({
             context.commit('setPresence', payload)
             socket.emit('presence', payload);
         },
+        sendWeather(context, payload) {
+            context.commit('setWeather', payload);
+            socket.emit('weather', payload);
+        },
         receivePresence(context, payload) {
             context.commit('setPresence', payload);
-            console.log(payload);
+        },
+        receiveWeather(context, payload) {
+            context.commit('setWeather', payload);
         },
         updateUsers(context, payload) {
             const users = payload.filter((user) => {
@@ -95,6 +108,9 @@ const store = createStore({
         getPresence(state) {
             return state.presence;
         },
+        getWeather(state) {
+            return state.weather;
+        },
         getUsers(state) {
             return state.users;
         },
@@ -117,6 +133,10 @@ socket.on('connect', () => {
 
 socket.on('presence', (presence) => {
     store.dispatch('receivePresence', presence);
+});
+
+socket.on('weather', (weather) => {
+    store.dispatch('receiveWeather', weather);
 });
 
 socket.on('updateUsers', (users) => {
