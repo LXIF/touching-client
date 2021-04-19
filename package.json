@@ -12,6 +12,7 @@
     "core-js": "^3.6.5",
     "socket.io-client": "^4.0.1",
     "stylus-loader": "^3.0.2",
+    "tone": "^14.7.77",
     "vue": "^3.0.0",
     "vue-router": "^4.0.6",
     "vuex": "^4.0.0"
