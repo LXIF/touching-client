@@ -16,35 +16,33 @@
 </template>
 
 <script>
-import ColorScreen from '../components/user/ColorScreen'
-import { useStore } from 'vuex'
-import { computed, watch, ref } from 'vue'
+import ColorScreen from '../components/user/ColorScreen';
+import { useStore } from 'vuex';
+import { computed, watch, ref } from 'vue';
 
-import * as Tone from 'tone'
+import * as Tone from 'tone';
 
 export default {
     setup() {
+        console.log('there');
         const store = useStore();
 
         const position = computed(() => store.getters.getPosition);
         const presence = computed(() => store.getters.getPresence);
         const weather = computed(() => store.getters.getWeather);
-        console.log(weather.value);
-
-
-        function startAudio() {
-            Tone.start();
-        }
 
         const synth = new Tone.Synth();
         synth.envelope.attack = 0.01;
         synth.envelope.release = 0.01;
         const synthDistortion = new Tone.Distortion(0.8);
-        const synthFreqShift = new Tone.FrequencyShifter(42);
+        // const synthFreqShift = new Tone.FrequencyShifter(42);
         const synthVolume = new Tone.Volume();
         synthVolume.mute = true;
 
-        synth.chain(synthVolume, synthDistortion, synthFreqShift, Tone.Destination);
+        synth.chain(synthVolume,
+        synthDistortion,
+        // synthFreqShift,
+        Tone.Destination);
 
         const synthIsPlaying = ref(true);
 
@@ -53,11 +51,11 @@ export default {
 
 
         function playNote() {
-            const nextTime = Math.pow(Math.random(), 2) * 200;
+            const nextTime = 200 + Math.pow(Math.random(), 2) * 200;
             setTimeout(() => {
                 
                 if(synthIsPlaying.value) {
-                    synth.triggerAttackRelease(2000, 0.05);
+                    synth.triggerAttackRelease(2000, 0.05, Tone.now());
                 }
                 playNote();
             }, nextTime);
@@ -65,6 +63,32 @@ export default {
 
 
 
+        
+        // initialize the noise and start
+        const noise = new Tone.Noise("pink").start();
+        // make an autofilter to shape the noise
+        const autoFilter = new Tone.AutoFilter({
+            frequency: 10 + Math.random() * 3,
+            baseFrequency: 10,
+            octaves: 10,
+            type: 'square'
+        }).start();
+        
+
+        const noiseVolume = new Tone.Volume();
+        noiseVolume.mute = true;
+        
+        // connect the noise
+        noise.chain(autoFilter, noiseVolume, Tone.Destination);
+        // // start the autofilter LFO
+        // autoFilter.start();
+
+
+
+        function startAudio() {
+            Tone.start();
+            playNote();
+        }
 
 
         const presenceLightness = computed(() => {
@@ -83,6 +107,13 @@ export default {
             }
         });
 
+        const weatherLightness = computed(() => {
+            const inputLightness = weather.value.lightness;
+            
+            // const randomValue = Math.random() * 10;
+            return inputLightness
+        }); 
+
         ////////////ADJUST PRESENCE PARAMETERS BASED ON LOCATION//////////////
 
         watch(presenceLightness, (newValue) => {
@@ -92,10 +123,21 @@ export default {
             } else {
                 synthVolume.mute = false;
                 synthVolume.volume.value = 0 - (100 - newValue) / 2;
-                synthFreqShift.frequency.value = newValue * 3;
+                // synthFreqShift.frequency.value = newValue * 3;
             }
-            console.log(synthVolume.volume.value);
+            // console.log(synthVolume.volume.value);
             // synthVolume.volume.value =
+        });
+
+        watch(weatherLightness, (newValue) => {
+            if(newValue <= 10) {
+                noiseVolume.mute = true;
+                noiseVolume.volume.value = -100;
+            } else {
+                noiseVolume.mute = false;
+                noiseVolume.volume.value = 0 - (100 - newValue);
+                // synthFreqShift.frequency.value = newValue * 3;
+            }
         });
 
         return {
