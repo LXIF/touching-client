@@ -8,26 +8,26 @@
 export default {
     props: {
         hue: {
-            type: Number,
+            // type: Number,
             default: 0
         },
         saturation: {
-            type: Number,
+            // type: Number,
             default: 0
         },
         lightness: {
-            type: Number,
+            // type: Number,
             default: 0
         },
         alpha: {
-            type: Number,
+            // type: Number,
             default: 1
         }
     },
     computed: {
         screenStyle() {
             return `
-                background-color: hsla(${this.hue}, ${this.saturation}%, ${this.lightness}%, ${this.alpha});
+                background-color: hsla(${Number(this.hue)}, ${Number(this.saturation)}%, ${Number(this.lightness)}%, ${Number(this.alpha)});
             `
         }
     }

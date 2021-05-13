@@ -1,6 +1,6 @@
 <template>
     <div class='fader-container'>
-        <svg id='fader' class='fader' :class="{red: !rainbow, rainbow: rainbow}" @pointerdown='startSetFaderPosition' @pointermove.prevent='setFaderPosition' viewBox='0 0 100 10'>
+        <svg id='fader' class='fader' :class="{red: !rainbow, rainbow: rainbow}" @pointerdown='startSetFaderPosition' @pointermove.prevent='setFaderPosition' viewBox='-5 0 110 10'>
             <circle class='fader-knob' :cx='valuePos' cy='5' r='5'></circle>
         </svg>
     </div>
@@ -46,7 +46,7 @@ export default {
                 const padWidth = fader.clientWidth;
                 // const faderHeight = xyPad.clientHeight;
 
-                let newX = e.offsetX / padWidth * 100;
+                let newX = (e.offsetX / padWidth * 110) - 5;
                 // let newY = e.offsetY / padHeight * 100;
 
                 if (newX > 100) {

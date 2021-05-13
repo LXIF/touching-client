@@ -14,6 +14,17 @@
             <base-fader v-model='globalWeather.lightness' />
             <label>alpha</label>
             <base-fader scale='1' v-model='globalWeather.alpha' />
+            <br><br>
+            <label>START TOUCHIZATION</label>
+            <base-swiper @activate='startTouchization'></base-swiper>
+            <label>MUTE TOUCHIZATION</label>
+            <base-swiper @activate='muteTouchization'></base-swiper>
+            <label>SKIP TOUCHIZATION NODE</label>
+            <base-swiper @activate='skipTouchizationNode'></base-swiper>
+            <label>RESET TOUCHIZATION</label>
+            <base-swiper @activate='resetTouchization'></base-swiper>
+            <!-- <label>TOUCHIZATION</label>
+            <input type='checkbox' v-model='touchingActive' /> -->
         </div>
     </div>
 </template>
@@ -28,6 +39,7 @@ export default {
     },
     data() {
         return {
+            touchingActive: false,
             presenceRadius: 10,
             globalWeather: {
                 hue: 0,
@@ -43,13 +55,33 @@ export default {
             handler() {
                 this.sendWeather(this.globalWeather);
             }
+        },
+        touchingActive(newValue) {
+            if(newValue) {
+                this.$store.dispatch('startTouchSequence');
+            } else {
+                console.log('off');
+                this.$store.dispatch('endTouchSequence');
+            }
         }
     },
     methods: {
         ...mapActions([
             'sendPresence',
             'sendWeather'
-            ])
+            ]),
+        startTouchization() {
+            console.log('startTouch');
+        },
+        muteTouchization() {
+            console.log('muteTouch');
+        },
+        skipTouchizationNode() {
+            console.log('skipTouch');
+        },
+        resetTouchization() {
+            console.log('resetTouch');
+        },
     },
     computed: {
         ...mapGetters(['getUsers'])

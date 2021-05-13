@@ -1,6 +1,6 @@
 import { createStore } from 'vuex';
 
-import { io } from 'socket.io-client';
+import io from 'socket.io-client';
 
 const socket = io(process.env.VUE_APP_HOST_IP);
 
@@ -8,6 +8,8 @@ const store = createStore({
     state() {
         return {
             id: 'user',
+            connected: false,
+            touching: false,
             position: {
                 x: 0,
                 y: 0
@@ -23,6 +25,7 @@ const store = createStore({
                 lightness: 0,
                 alpha: 0
             },
+            requestingTouch: false,
             users: [],
             rafals: [],
             andris: []
@@ -50,6 +53,15 @@ const store = createStore({
         },
         updateRafals(state, payload) {
             state.rafals = payload;
+        },
+        startTouchRequest(state) {
+            state.requestingTouch = true;
+        },
+        endTouchRequest(state) {
+            state.requestingTouch = false;
+        },
+        setConnectionStatus(state, payload) {
+            state.connected = payload;
         }
     },
     actions: {
@@ -70,6 +82,11 @@ const store = createStore({
         sendWeather(context, payload) {
             context.commit('setWeather', payload);
             socket.emit('weather', payload);
+        },
+        sendTouch(context) {
+            console.log('sending');
+            context.commit('endTouchRequest');
+            socket.emit('sendtouch');
         },
         receivePresence(context, payload) {
             context.commit('setPresence', payload);
@@ -96,6 +113,18 @@ const store = createStore({
             // console.log(context.getters['getRafals']);
 
 
+        },
+        startTouchRequest(context, payload) {
+            context.commit('startTouchRequest', payload);
+        },
+        startTouchSequence() {
+            socket.emit('touchsequence', 'start');
+        },
+        endTouchSequence() {
+            socket.emit('touchsequence', 'end');
+        },
+        setConnectionStatus(context, payload) {
+            context.commit('setConnectionStatus', payload);
         }
     },
     getters: {
@@ -119,15 +148,26 @@ const store = createStore({
         },
         getRafals(state) {
             return state.rafals;
+        },
+        getTouchRequested(state) {
+            return state.requestingTouch;
+        },
+        connected(state) {
+            return state.connected;
+        },
+        isTouching(state) {
+            return state.isTouching;
         }
     }
 
 });
 
 socket.on('connect', () => {
+    store.dispatch('setConnectionStatus', true);
     socket.emit('howdy', {
         id: store.getters['getId'],
-        position: store.getters['getPosition']
+        position: store.getters['getPosition'],
+        touching: store.getters['isTouching']
     });
 });
 
@@ -141,6 +181,10 @@ socket.on('weather', (weather) => {
 
 socket.on('updateUsers', (users) => {
     store.dispatch('updateUsers', users);
+});
+
+socket.on('requesttouch', () => {
+    store.dispatch('startTouchRequest');
 });
 
 export default store;

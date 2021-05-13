@@ -11,7 +11,7 @@
         padding 0 20px
         border none
         background transparent 
-        box-shadow 0 0 5px #0f0
+        box-shadow 0 0 5px #000
         transition all 0.3s
         color color-light
         &:hover
