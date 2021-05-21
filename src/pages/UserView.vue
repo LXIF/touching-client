@@ -1,14 +1,23 @@
 <template>
     <div>
-        <!-- <base-swipe
-         :show='!audioIsActive' text='swipe right to be touching' @swipe='startAudio'></base-swipe> -->
+        <base-swipe
+         :show='pleaseTouch'
+         text='swipe right to be touching'
+         @swipe='respondTouch'></base-swipe>
         <div class='welcome' v-if='!audioIsActive'>
             <h3>Do you allow your phone to be in touch for the duration of this performance? No data will be collected.</h3>
-            <base-button @click='startAudio'>YES</base-button>
+            <button @click='startAudio'>YES</button>
         </div>
         <!-- <base-swipe :show='!audioIsActive' text='swipe right to be touching' @pointerdown='startAudio'></base-swipe> -->
+        <color-screen id='touchization-display'
+            v-if="usersColors"
+            :hue='touchingColor'
+            saturation='100'
+            lightness='50'
+        />
         <color-screen id='presence-display'
             :lightness='presenceLightness'
+            :alpha='presenceLightness'
         />
         <color-screen id='weather-display'
             :lightness='weather.lightness'
@@ -27,20 +36,21 @@
 
 <script>
 import ColorScreen from '../components/user/ColorScreen';
-import { useStore } from 'vuex';
+import { useStore, mapGetters } from 'vuex';
 import { computed, watch, ref } from 'vue';
 
 import * as Tone from 'tone';
+import NoSleep from 'nosleep.js'
 
 export default {
     setup() {
         console.log('setup');
         const store = useStore();
 
-        const touchRequested = computed(() => store.getters.getTouchRequested);
-        function sendTouch() {
-            store.dispatch('sendTouch');
-        }
+        // const touchRequested = computed(() => store.getters.getTouchRequested);
+        // function sendTouch() {
+        //     store.dispatch('sendTouch');
+        // }
 
         const position = computed(() => store.getters.getPosition);
         const presence = computed(() => store.getters.getPresence);
@@ -52,6 +62,8 @@ export default {
         }
 
         // const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
+
+        let noSleep = new NoSleep();
 
 
         ////////////Presence Synth///////////
@@ -168,7 +180,7 @@ export default {
 
 
 
-
+        //////////WEATHER SYNTHS/////////
 
 
         
@@ -194,14 +206,16 @@ export default {
         const audioIsActive = ref(false);
 
         function startAudio() {
-            console.log('now');
+            noSleep.enable();
             audioIsActive.value = true;
+            document.querySelector('body').requestFullscreen();
             Tone.start()
             .then(() => {
                 console.log('tone started');
                 Tone.Transport.start();
                 presenceSound();
             });
+            store.dispatch('startAudio');
         }
 
         const weatherLightness = computed(() => {
@@ -210,6 +224,117 @@ export default {
             // const randomValue = Math.random() * 10;
             return inputLightness
         }); 
+
+
+
+        //////////////////POEM SAMPLES/////////////
+
+        const poemBaseUrl = '/samples/poem/';
+
+        const poemSentences = [
+                '01-imagine_this_dance-bounce-1.wav_16.wav',
+                '02-happening_forever-bounce-1.wav_16.wav',
+                '03-since_always-bounce-1.wav_16.wav',
+                '04-forever-bounce-1.wav_16.wav',
+                '05-world_without_a_beginning-bounce-1.wav_16.wav',
+                '06-and_without_an_end-bounce-1.wav_16.wav',
+                '07-touching-bounce-1.wav_16.wav',
+                '08-trans-reality-bounce-1.wav_16.wav',
+                '09-entanglement-bounce-1.wav_16.wav',
+                '10-caring-bounce-1.wav_16.wav',
+                '11-mattering-bounce-1.wav_16.wav',
+                '12-in_an_endless_ecstasy_of_communication-bounce-1.wav_16.wav',
+                '13-no_void-bounce-1.wav_16.wav',
+                '14-no_self-bounce-1.wav_16.wav',
+                '15-these_are_the_days_of_miracle_and_wonder-bounce-1.wav_16.wav',
+                '16-this_is_the_long_distance_call-bounce-1.wav_16.wav',
+                '17-the_way_the_camera_follows_us_in_slomo-bounce-1.wav_16.wav',
+                '18-the_way_we_look_to_us_all-bounce-1.wav_16.wav',
+                '19-the_way_we_look_to_a_distant_constellation-bounce-1.wav_16.wav',
+                '20-thats_dying_in_a_corner_in_the_sky-bounce-1.wav_16.wav',
+                '21-these_are_the_days_of_miracle_and_wonder-bounce-2.wav_16.wav',
+                '22-and_dont_cry_baby-bounce-1.wav_16.wav',
+                '23-dont_cry-bounce-1.wav_16.wav',
+                '24-it_was_a_dry_wind-bounce-1.wav_16.wav',
+                '25-and_it_swept_across_the_desert-bounce-1.wav_16.wav',
+                '26-and_it_curled_into_the_circle_of_birth-bounce-1.wav_16.wav',
+                '27-and_the_dead_sand_falling_on_the_children-bounce-1.wav_16.wav',
+                '28-the_mothers_and_the_fathers-bounce-1.wav_16.wav',
+                '29-and_the_automatic_earth-bounce-1.wav_16.wav',
+                '30-and_i_believe-bounce-1.wav_16.wav',
+                '31-these_are_the_days_of_lasers_in_the_jungle-bounce-1.wav_16.wav',
+                '32-lasers_in_the_jungle_somewhere-bounce-1.wav_16.wav',
+                '33-staccato_signals_of_constant_information-bounce-1.wav_16.wav',
+                '34-and_baby-bounce-1.wav_16.wav',
+                '35-these_are_the_days_of_miracle_and_wonder-bounce-3.wav_16.wav',
+                '36-this_is_the_long_distance_call-bounce-2.wav_16.wav',
+                '37-this_is_about_entanglements-bounce-1.wav_16.wav',
+                '38-matter-bounce-1.wav_16.wav',
+                '39-and_meaning-bounce-1.wav_16.wav'
+        ];
+
+        const poemSamplers = [];
+
+        const poemChorus = new Tone.Chorus(4, 2.5, 0.5);
+        let poemFeedbackDelay = new Tone.FeedbackDelay(200, 0.1);
+
+        poemChorus.connect(poemFeedbackDelay);
+        poemFeedbackDelay.toDestination();
+
+        for(const sentence in poemSentences) {
+            const sentenceSampler = new Tone.Sampler({
+                'C3' : poemSentences[sentence]
+            },
+            () => {
+                // console.log('loaded ' + poemSentences[sentence]);
+            },
+                poemBaseUrl
+            );
+            sentenceSampler.connect(poemChorus);
+            poemSamplers.push(sentenceSampler);
+        }
+
+        const nextPoemSample = computed(() => {
+            return store.getters['nextPoemSample'];
+        });
+
+        watch(nextPoemSample, (newValue) => {
+            const index = newValue.index;
+            const probability = newValue.probability;
+            const normalizedProbability = probability / 100;
+            const randomPlayToss = Math.random();
+            const normalPitch = 130;
+
+            const randomPitchAmountNormalized = newValue.randomPitch / 100;
+            const maxPitchUp = 300;
+            const maxPitchDown = 60;
+
+            const upOrDown = Math.random() > 0.5;
+            // const maxPitchFactor = 2;
+            let playPitch;
+
+            if(upOrDown) {
+                playPitch = normalPitch + randomPitchAmountNormalized * maxPitchUp;
+            } else {
+                playPitch = normalPitch - randomPitchAmountNormalized * maxPitchDown;
+            }
+            
+
+            // poemFeedbackDelay = new Tone.FeedbackDelay(Math.random() * 150 + 50, 0.3);
+
+            // console.log('randomPitch: ' + randomPitch);
+            // console.log('playPitch: ' + playPitch);
+
+
+            // const timeJitter = newValue.timeJitter;
+
+            // const playPitch = normalPitch;
+            
+
+            if(normalizedProbability > randomPlayToss) {
+                poemSamplers[index-1].triggerAttack(playPitch);
+            }
+        })
 
         ////////////ADJUST PRESENCE PARAMETERS BASED ON LOCATION//////////////
 
@@ -230,13 +355,33 @@ export default {
             presenceLightness,
             weather,
             audioIsActive,
-            touchRequested,
-            sendTouch
+            // touchRequested,
+            // sendTouch
             // presenceLightnessJittered
         }
     },
     components: {
         ColorScreen
+    },
+    computed: {
+        ...mapGetters(['pleaseTouch']),
+        touching() {
+            return this.$store.getters['isTouching']
+        },
+        touchingColor() {
+            return this.$store.getters['touchingColor']
+        },
+        touchizationMuted() {
+            return this.$store.getters['touchizationMuted']
+        },
+        usersColors() {
+            return this.$store.getters['usersColors']
+        }
+    },
+    methods: {
+        respondTouch() {
+            this.$store.dispatch('respondTouch');
+        }
     }
 }
 </script>
@@ -250,7 +395,22 @@ export default {
         position fixed
         top 0
         left 0
+        padding 30px
+        box-sizing border-box
 
     h3
         font-size 2rem
+        text-align center
+
+    button
+        position fixed
+        bottom 10vw
+        left 10vw
+        height 40vw
+        width 40vw
+        border none
+        font-size 7rem
+        border-radius 100%
+        max-width 400px
+        max-height 400px
 </style>

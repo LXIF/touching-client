@@ -40,6 +40,7 @@ export default {
         },
         setSwiperPosition(e) {
             if(this.touching) {
+                // console.log(e.pageX);
                 const swiper = document.getElementById('swiper');
                 const padWidth = swiper.clientWidth;
                 // const swiperHeight = xyPad.clientHeight;
@@ -76,6 +77,7 @@ export default {
         background gray
         border-radius 20px
         transition all 0.2s ease
+        touch-action none
 
     .hot
         animation hot-blink 0.3s infinite

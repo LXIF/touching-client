@@ -12,6 +12,9 @@ const routes = [
         path: '/',
         component: UserView,
         beforeEnter(to, _, next) {
+            localStorage.setItem('x', 50);
+            localStorage.setItem('y', 50);
+            localStorage.setItem('id', 'user');
             
             if(localStorage.getItem('id') === 'user' && !to.query.x && !to.query.y) {
                 store.dispatch('setPosition', {

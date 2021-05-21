@@ -29,7 +29,7 @@ export default {
         z-index -1
 
     .frame-connected
-        box-shadow inset 0 0 10px rgba(255,255,255,0.5)
+        box-shadow inset 0 0 30px rgba(255,255,255,0.5)
 
     .frame-disconnected
         box-shadow inset 0 0 30px #f00

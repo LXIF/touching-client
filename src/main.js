@@ -9,6 +9,7 @@ import BaseFader from './components/UI/BaseFader'
 import BaseSwipe from './components/UI/BaseSwipe'
 import ConnectionFrame from './components/UI/ConnectionFrame'
 import BaseSwiper from './components/UI/BaseSwiper'
+import BaseCheckbox from './components/UI/BaseCheckbox'
 
 createApp(App)
 
@@ -18,6 +19,7 @@ createApp(App)
 .component('base-swipe', BaseSwipe)
 .component('connection-frame', ConnectionFrame)
 .component('base-swiper', BaseSwiper)
+.component('base-checkbox', BaseCheckbox)
 
 .use(router)
 .use(store)

@@ -1,45 +1,91 @@
 <template>
     <div class='andri-card'>
         <div class='andri'>
-            <h1>local presence</h1>
-            <xy-pad :users='getUsers' id='presence-xy' @presence='sendPresence' :radius='presenceRadius' />
-            <label>radius</label>
-            <base-fader v-model='presenceRadius' />
-            <h1>global weather</h1>
-            <label>hue</label>
-            <base-fader rainbow='true' scale='360' v-model='globalWeather.hue' />
-            <label>saturation</label>
-            <base-fader v-model='globalWeather.saturation' />
-            <label>lightness</label>
-            <base-fader v-model='globalWeather.lightness' />
-            <label>alpha</label>
-            <base-fader scale='1' v-model='globalWeather.alpha' />
+            <div id='connections-display'>
+                <h1>users</h1>
+                <users-list :users='users' />
+                <h1>rafals</h1>
+                <users-list :users='rafals' />
+            </div>
+
+            <div id='presence'>
+                <h1>local presence</h1>
+                <xy-pad :users='getUsers' id='presence-xy' @presence='sendPresence' :radius='presenceRadius' />
+                <label>radius</label>
+                <base-fader v-model='presenceRadius' />
+            </div>
+            
+            <div id='weather'>
+                <h1>WEATHERS</h1>
+                <h2>noise</h2>
+                <label>hue</label>
+                <base-fader rainbow='true' scale='360' v-model='globalWeather.hue' />
+                <label>saturation</label>
+                <base-fader v-model='globalWeather.saturation' />
+                <label>lightness</label>
+                <base-fader v-model='globalWeather.lightness' />
+                <label>alpha</label>
+                <base-fader scale='1' v-model='globalWeather.alpha' />
+
+                <!-- <h1>WEATHERS</h1>
+                <h2>noise</h2>
+                <label>hue</label>
+                <base-fader rainbow='true' scale='360' v-model='globalWeather.hue' />
+                <label>saturation</label>
+                <base-fader v-model='globalWeather.saturation' />
+                <label>lightness</label>
+                <base-fader v-model='globalWeather.lightness' />
+                <label>alpha</label>
+                <base-fader scale='1' v-model='globalWeather.alpha' /> -->
+
+
+            </div>
+            
             <br><br>
-            <label>START TOUCHIZATION</label>
-            <base-swiper @activate='startTouchization'></base-swiper>
-            <label>MUTE TOUCHIZATION</label>
-            <base-swiper @activate='muteTouchization'></base-swiper>
-            <label>SKIP TOUCHIZATION NODE</label>
-            <base-swiper @activate='skipTouchizationNode'></base-swiper>
-            <label>RESET TOUCHIZATION</label>
-            <base-swiper @activate='resetTouchization'></base-swiper>
-            <!-- <label>TOUCHIZATION</label>
-            <input type='checkbox' v-model='touchingActive' /> -->
+
+            <div id='touchization'>
+                <h1>TOUCHIZATION IS <span v-if='touchizationOngoing'>ON</span></h1>
+                <label>RAFAL COLORS </label>
+                <label v-if='rafalColors'>RAFAL is COLORS</label><br>
+                <label v-if='!rafalColors'>RAFAL is BLACK</label>
+                <base-swiper @activate='toggleRafalColors'></base-swiper>
+                <label v-if='usersColors'>RAFAL is COLORS</label><br>
+                <label v-if='!usersColors'>RAFAL is BLACK</label>
+                <base-swiper @activate='toggleUsersColors'></base-swiper>
+                <!-- <label>SKIP TOUCHIZATION NODE</label>
+                <base-swiper @activate='skipTouchizationNode'></base-swiper>
+                <label>RESET TOUCHIZATION</label>
+                <base-swiper @activate='resetTouchization'></base-swiper>
+                <label>STROBE TOUCHIZATION</label>
+                <base-swiper @activate='toggleStrobeTouchization'></base-swiper> -->
+                <!-- <label>TOUCHIZATION</label>
+                <input type='checkbox' v-model='touchingActive' /> -->
+            </div>
+
+            <br><br>
+
+            <div id='poem'>
+                <poem-trigger />
+            </div>
         </div>
     </div>
 </template>
 
 <script>
 import XyPad from '../components/UI/XyPad'
+import UsersList from '../components/layout/UsersList'
+import PoemTrigger from '../components/UI/PoemTrigger'
+
 import { mapActions, mapGetters } from 'vuex'
 
 export default {
     components: {
-        XyPad
+        XyPad,
+        UsersList,
+        PoemTrigger
     },
     data() {
         return {
-            touchingActive: false,
             presenceRadius: 10,
             globalWeather: {
                 hue: 0,
@@ -56,14 +102,6 @@ export default {
                 this.sendWeather(this.globalWeather);
             }
         },
-        touchingActive(newValue) {
-            if(newValue) {
-                this.$store.dispatch('startTouchSequence');
-            } else {
-                console.log('off');
-                this.$store.dispatch('endTouchSequence');
-            }
-        }
     },
     methods: {
         ...mapActions([
@@ -71,20 +109,53 @@ export default {
             'sendWeather'
             ]),
         startTouchization() {
-            console.log('startTouch');
+            this.$store.dispatch('startTouchization');
         },
-        muteTouchization() {
-            console.log('muteTouch');
+        toggleMuteTouchization() {
+            if(this.touchizationMuted) {
+                this.$store.dispatch('sendMuteTouchization', false);
+            } else {
+                this.$store.dispatch('sendMuteTouchization', true);
+            }
         },
         skipTouchizationNode() {
-            console.log('skipTouch');
+            this.$store.dispatch('skipTouchization');
         },
         resetTouchization() {
-            console.log('resetTouch');
+            this.$store.dispatch('resetTouchization');
+        },
+        toggleStrobeTouchization() {
+            this.$store.dispatch('toggleTouchizationStrobe');
+        },
+        toggleRafalColors() {
+            this.$store.dispatch('toggleRafalColors');
+        },
+        toggleUsersColors() {
+            this.$store.dispatch('toggleUsersColors');
         },
     },
     computed: {
-        ...mapGetters(['getUsers'])
+        ...mapGetters(['getUsers']),
+
+        users() {
+            return this.$store.getters['getUsers']
+        },
+        rafals() {
+            return this.$store.getters['getRafals']
+        },
+        touchizationOngoing() {
+            return this.$store.getters['touchizationOngoing']
+        },
+        touchizationMuted() {
+            return this.$store.getters['touchizationMuted']
+        },
+        rafalColors() {
+            return this.$store.getters['rafalColors']
+        },
+        usersColors() {
+            return this.$store.getters['usersColors']
+        }
+    
     }
 }
 </script>

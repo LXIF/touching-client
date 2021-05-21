@@ -28,10 +28,10 @@ export default {
             }
         },
         endSwiping() {
-            // const pageWidth = document.querySelector('html').getBoundingClientRect().width;
-            // if(this.translateX > pageWidth / 3) {
-            //     this.$emit('swipe');
-            // }
+            const pageWidth = document.querySelector('html').getBoundingClientRect().width;
+            if(this.translateX > pageWidth / 3) {
+                this.$emit('swipe');
+            }
             this.translateX = 0;
             this.isSwiping = false;
         }
@@ -59,6 +59,7 @@ export default {
         grid-row 2/3
         margin 0
         animation 3s heartbeat infinite ease
+        pointer-events none
 
     .swiper-enter-from
         opacity 0
