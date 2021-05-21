@@ -349,11 +349,12 @@ socket.on('touchization', (message) => {
 });
 
 socket.on('touchcolor', (color) => {
-    console.log(color);
+    // console.log(color);
     store.dispatch('setTouchingColor', color);
 });
 
 socket.on('poem', (message) => {
+    console.log(message);
     store.dispatch('setPoemSample', message);
 })
 
