@@ -1,6 +1,12 @@
 <template>
     <div>
         <h1>POEM</h1>
+        <label>SOURCE MIRA</label>
+        <base-checkbox v-model='sourceMira' />
+        <br>
+        <label>SOURCE RAFAL</label>
+        <base-checkbox v-model='sourceRafal' />
+        <br>
         <label>OUTPUT RAFAL</label>
         <base-checkbox v-model='outputRafals' />
         <br>
@@ -21,15 +27,30 @@
 export default {
     methods: {  
         triggerSentence(index) {
-            const triggerObject = {
+            if(this.sourceMira) {
+                const triggerObject = {
+                    index,
+                    probability: this.probability,
+                    randomPitch: this.randomPitch,
+                    timeJitter: this.timeJitter,
+                    outputRafals: this.outputRafals,
+                    outputUsers: this.outputUsers,
+                    source: 'mira'
+                }
+            this.$store.dispatch('triggerPoemSentenceMira', triggerObject);
+            }
+            if(this.sourceRafal) {
+                const triggerObject = {
                 index,
                 probability: this.probability,
                 randomPitch: this.randomPitch,
                 timeJitter: this.timeJitter,
                 outputRafals: this.outputRafals,
-                outputUsers: this.outputUsers
+                outputUsers: this.outputUsers,
+                source: 'rafal'
             }
-            this.$store.dispatch('triggerPoemSentence', triggerObject);
+            this.$store.dispatch('triggerPoemSentenceRafal', triggerObject);
+            }
         }
     },
     data() {
@@ -37,203 +58,250 @@ export default {
             probability: 0,
             randomPitch: 0,
             timeJitter: 0,
-            outputRafals: false,
+            outputRafals: true,
             outputUsers: false,
+            sourceMira: true,
+            sourceRafal: false,
             sentences: [
                 {
                     index: 1,
                     text: 'imagine this dance',
-                    path: '01-imagine_this_dance-bounce-1.wav_16.wav'
+                    miraPath: '01-imagine_this_dance-bounce-1.wav_16.wav',
+                    rafalPath: '01_rafal_imagine_this_dance-bounce-2.wav'
                 },
                 {
                     index: 2,
                     text: 'happening forever',
-                    path: '02-happening_forever-bounce-1.wav_16.wav'
+                    miraPath: '02-happening_forever-bounce-1.wav_16.wav',
+                    rafalPath: '02_rafal_happening_forever-bounce-2.wav'
                 },
                 {
                     index: 3,
                     text: 'since always',
-                    path: '03-since_always-bounce-1.wav_16.wav'
+                    miraPath: '03-since_always-bounce-1.wav_16.wav',
+                    rafalPath: '03_rafal_since_always-bounce-2.wav'
                 },
                 {
                     index: 4,
                     text: 'forever',
-                    path: '04-forever-bounce-1.wav_16.wav'
+                    miraPath: '04-forever-bounce-1.wav_16.wav',
+                    rafalPath: '04_rafal_forever-bounce-2.wav'
                 },
                 {
                     index: 5,
                     text: 'world without a beginning',
-                    path: '05-world_without_a_beginning-bounce-1.wav_16.wav'
+                    miraPath: '05-world_without_a_beginning-bounce-1.wav_16.wav',
+                    rafalPath: '05_rafal_world_without_a_beginning-bounce-2.wav'
                 },
                 {
                     index: 6,
                     text: 'and without an end',
-                    path: '06-and_without_an_end-bounce-1.wav_16.wav'
+                    miraPath: '06-and_without_an_end-bounce-1.wav_16.wav',
+                    rafalPath: '06_rafal_and_without_an_end-bounce-2.wav'
                 },
                 {
                     index: 7,
                     text: 'touching',
-                    path: '07-touching-bounce-1.wav_16.wav'
+                    miraPath: '07-touching-bounce-1.wav_16.wav',
+                    rafalPath: '07_rafal_touching-bounce-2.wav'
                 },
                 {
                     index: 8,
                     text: 'trans reality',
-                    path: '08-trans-reality-bounce-1.wav_16.wav'
+                    miraPath: '08-trans-reality-bounce-1.wav_16.wav',
+                    rafalPath: '08_rafal_trans_reality-bounce-2.wav'
                 },
                 {
                     index: 9,
                     text: 'entanglement',
-                    path: '09-entanglement-bounce-1.wav_16.wav',
+                    miraPath: '09-entanglement-bounce-1.wav_16.wav',
+                    rafalPath: '09_rafal_entanglement-bounce-2.wav'
                 },
                 {
                     index: 10,
                     text: 'caring',
-                    path: '10-caring-bounce-1.wav_16.wav',
+                    miraPath: '10-caring-bounce-1.wav_16.wav',
+                    rafalPath: '10_rafal_caring-bounce-2.wav'
                 },
                 {
                     index: 11,
                     text: 'mattering',
-                    path: '11-mattering-bounce-1.wav_16.wav',
+                    miraPath: '11-mattering-bounce-1.wav_16.wav',
+                    rafalPath: '11_rafal_mattering-bounce-2.wav'
                 },
                 {
                     index: 12,
                     text: 'in an endless ecstasy of communication',
-                    path: '12-in_an_endless_ecstasy_of_communication-bounce-1.wav_16.wav',
+                    miraPath: '12-in_an_endless_ecstasy_of_communication-bounce-1.wav_16.wav',
+                    rafalPath: '12_rafal_in_an_endless_ecstasy_of_communication-bounce-2.wav'
                 },
                 {
                     index: 13,
                     text: 'no void',
-                    path: '13-no_void-bounce-1.wav_16.wav',
+                    miraPath: '13-no_void-bounce-1.wav_16.wav',
+                    rafalPath: '13_rafal_no_void-bounce-2.wav'
                 },
                 {
                     index: 14,
                     text: 'no self',
-                    path: '14-no_self-bounce-1.wav_16.wav',
+                    miraPath: '14-no_self-bounce-1.wav_16.wav',
+                    rafalPath: '14_rafal_no_self-bounce-2.wav'
                 },
                 {
                     index: 15,
                     text: 'these are the days of miracle and wonder',
-                    path: '15-these_are_the_days_of_miracle_and_wonder-bounce-1.wav_16.wav',
+                    miraPath: '15-these_are_the_days_of_miracle_and_wonder-bounce-1.wav_16.wav',
+                    rafalPath: '15_rafal_these_are_the_days_of_miracle_and_wonder-bounce-2.wav'
                 },
                 {
                     index: 16,
                     text: 'this is the long distance call',
-                    path: '16-this_is_the_long_distance_call-bounce-1.wav_16.wav',
+                    miraPath: '16-this_is_the_long_distance_call-bounce-1.wav_16.wav',
+                    rafalPath: '16_rafal_this_is_the_long_distance_call-bounce-2.wav'
                 },
                 {
                     index: 17,
                     text: 'the way the camera follows us in slomo-bounce',
-                    path: '17-the_way_the_camera_follows_us_in_slomo-bounce-1.wav_16.wav',
+                    miraPath: '17-the_way_the_camera_follows_us_in_slomo-bounce-1.wav_16.wav',
+                    rafalPath: '17_rafal_the_way_the_camera_follows_us_in_slomo-bounce-2.wav'
                 },
                 {
                     index: 18,
                     text: 'the way we look to us all',
-                    path: '18-the_way_we_look_to_us_all-bounce-1.wav_16.wav',
+                    miraPath: '18-the_way_we_look_to_us_all-bounce-1.wav_16.wav',
+                    rafalPath: '18_rafal_the_way_we_look_to_us_all-bounce-2.wav'
                 },
                 {
                     index: 19,
                     text: 'the way we look to a distant constellation',
-                    path: '19-the_way_we_look_to_a_distant_constellation-bounce-1.wav_16.wav',
+                    miraPath: '19-the_way_we_look_to_a_distant_constellation-bounce-1.wav_16.wav',
+                    rafalPath: '19_rafal_the_way_we_look_to_a_distant_constellation-bounce-2.wav'
                 },
                 {
                     index: 20,
                     text: 'thats dying in a corner in the sky',
-                    path: '20-thats_dying_in_a_corner_in_the_sky-bounce-1.wav_16.wav',
+                    miraPath: '20-thats_dying_in_a_corner_in_the_sky-bounce-1.wav_16.wav',
+                    rafalPath: '20_rafal_thats_dying_in_a_corner_in_the_sky-bounce-2.wav'
                 },
                 {
                     index: 21,
                     text: 'these are the days of miracle and wonder',
-                    path: '21-these_are_the_days_of_miracle_and_wonder-bounce-2.wav_16.wav',
+                    miraPath: '21-these_are_the_days_of_miracle_and_wonder-bounce-2.wav_16.wav',
+                    rafalPath: '21_rafal_these_are_the_days_of_miracle_and_wonder-bounce-2.wav'
                 },
                 {
                     index: 22,
                     text: "and don't cry, baby, baby",
-                    path: '22-and_dont_cry_baby-bounce-1.wav_16.wav',
+                    miraPath: '22-and_dont_cry_baby-bounce-1.wav_16.wav',
+                    rafalPath: '22_rafal_and_dont_cry_baby-bounce-2.wav'
                 },
                 {
                     index: 23,
                     text: "don't cry",
-                    path: '23-dont_cry-bounce-1.wav_16.wav',
+                    miraPath: '23-dont_cry-bounce-1.wav_16.wav',
+                    rafalPath: '23_rafal_dont_cry-bounce-2.wav'
                 },
                 {
                     index: 24,
                     text: 'it was a dry wind',
-                    path: '24-it_was_a_dry_wind-bounce-1.wav_16.wav',
+                    miraPath: '24-it_was_a_dry_wind-bounce-1.wav_16.wav',
+                    rafalPath: '24_rafal_it_was_a_dry_wind-bounce-2.wav'
                 },
                 {
                     index: 25,
                     text: 'and it swept across the desert',
-                    path: '25-and_it_swept_across_the_desert-bounce-1.wav_16.wav',
+                    miraPath: '25-and_it_swept_across_the_desert-bounce-1.wav_16.wav',
+                    rafalPath: '25_rafal_and_it_swept_across_the_desert-bounce-2.wav'
                 },
                 {
                     index: 26,
                     text: 'and it curled into the circle of birth',
-                    path: '26-and_it_curled_into_the_circle_of_birth-bounce-1.wav_16.wav',
+                    miraPath: '26-and_it_curled_into_the_circle_of_birth-bounce-1.wav_16.wav',
+                    rafalPath: '26_rafal_and_it_curled_into_the_circle_of_birth-bounce-2.wav'
                 },
                 {
                     index: 27,
                     text: 'and the dead sand falling on the children',
-                    path: '27-and_the_dead_sand_falling_on_the_children-bounce-1.wav_16.wav',
+                    miraPath: '27-and_the_dead_sand_falling_on_the_children-bounce-1.wav_16.wav',
+                    rafalPath: '27_rafal_and_the_dead_sand_falling_on_the_children-bounce-2.wav'
                 },
                 {
                     index: 28,
                     text: 'the mothers and the fathers',
-                    path: '28-the_mothers_and_the_fathers-bounce-1.wav_16.wav',
+                    miraPath: '28-the_mothers_and_the_fathers-bounce-1.wav_16.wav',
+                    rafalPath: '28_rafal_the_mothers_and_the_fathers-bounce-2.wav'
                 },
                 {
                     index: 29,
                     text: 'and the automatic earth',
-                    path: '29-and_the_automatic_earth-bounce-1.wav_16.wav',
+                    miraPath: '29-and_the_automatic_earth-bounce-1.wav_16.wav',
+                    rafalPath: '29_rafal_and_the_automatic_earth-bounce-2.wav'
                 },
                 {
                     index: 30,
                     text: 'and i believe',
-                    path: '30-and_i_believe-bounce-1.wav_16.wav',
+                    miraPath: '30-and_i_believe-bounce-1.wav_16.wav',
+                    rafalPath: '30_rafal_and_i_believe-bounce-3.wav'
                 },
                 {
                     index: 31,
                     text: 'these are the days of lasers in the jungle',
-                    path: '31-these_are_the_days_of_lasers_in_the_jungle-bounce-1.wav_16.wav',
+                    miraPath: '31-these_are_the_days_of_lasers_in_the_jungle-bounce-1.wav_16.wav',
+                    rafalPath: '31_rafal_these_are_the_days_of_lasers_in_the_jungle-bounce-3.wav'
                 },
                 {
                     index: 32,
                     text: 'lasers in the jungle somewhere',
-                    path: '32-lasers_in_the_jungle_somewhere-bounce-1.wav_16.wav',
+                    miraPath: '32-lasers_in_the_jungle_somewhere-bounce-1.wav_16.wav',
+                    rafalPath: '32_rafal_lasers_in_the_jungle_somewhere-bounce-2.wav'
                 },
                 {
                     index: 33,
                     text: 'staccato signals of constant information',
-                    path: '33-staccato_signals_of_constant_information-bounce-1.wav_16.wav',
+                    miraPath: '33-staccato_signals_of_constant_information-bounce-1.wav_16.wav',
+                    rafalPath: '33_rafal_staccato_signals_of_constant_information-bounce-2.wav'
                 },
                 {
                     index: 34,
-                    text: 'and baby',
-                    path: '34-and_baby-bounce-1.wav_16.wav',
+                    text: 'a loose affiliation of millionaires and billionaires',
+                    miraPath: '34-a_loose_affiliation_of_millionaires_and_billionaires-bounce-1.wav',
+                    rafalPath: '34_rafal_a_loose_affiliation_of_millionaires_and_billionaires-bounce-2.wav'
                 },
                 {
                     index: 35,
-                    text: 'these are the days of miracle and wonder',
-                    path: '35-these_are_the_days_of_miracle_and_wonder-bounce-3.wav_16.wav',
+                    text: 'and baby',
+                    miraPath: '35-and_baby-bounce-1.wav_16.wav',
+                    rafalPath: '35_rafal_and_baby-bounce-2.wav'
                 },
                 {
                     index: 36,
-                    text: 'this is the long distance call',
-                    path: '36-this_is_the_long_distance_call-bounce-2.wav_16.wav',
+                    text: 'these are the days of miracle and wonder',
+                    miraPath: '36-these_are_the_days_of_miracle_and_wonder-bounce-3.wav_16.wav',
+                    rafalPath: '36_rafal_these_are_the_days_of_miracle_and_wonder-bounce-2.wav'
                 },
                 {
                     index: 37,
-                    text: 'this is about entanglements',
-                    path: '37-this_is_about_entanglements-bounce-1.wav_16.wav',
+                    text: 'this is the long distance call',
+                    miraPath: '37-this_is_the_long_distance_call-bounce-2.wav_16.wav',
+                    rafalPath: '37_rafal_this_is_the_long_distance_call-bounce-2.wav'
                 },
                 {
                     index: 38,
-                    text: 'matter',
-                    path: '38-matter-bounce-1.wav_16.wav',
+                    text: 'this is about entanglements',
+                    miraPath: '38-this_is_about_entanglements-bounce-1.wav_16.wav',
+                    rafalPath: '38_rafal_this_is_about_entanglements-bounce-2.wav'
                 },
                 {
                     index: 39,
+                    text: 'matter',
+                    miraPath: '39-matter-bounce-1.wav_16.wav',
+                    rafalPath: '39_rafal_matter-bounce-2.wav'
+                },
+                {
+                    index: 40,
                     text: 'and meaning',
-                    path: '39-and_meaning-bounce-1.wav_16.wav',
+                    miraPath: '40-and_meaning-bounce-1.wav_16.wav',
+                    rafalPath: '40_rafal_meaning-bounce-2.wav'
                 },
             ]
         }

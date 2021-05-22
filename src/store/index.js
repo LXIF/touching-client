@@ -33,7 +33,10 @@ const store = createStore({
             users: [],
             rafals: [],
             andris: [],
-            nextPoemSample: undefined,
+
+
+            nextPoemSampleMira: undefined,
+            nextPoemSampleRafal: undefined,
             rafalColors: false,
             usersColors: false,
         }
@@ -85,8 +88,11 @@ const store = createStore({
         setTouchingColor(state, payload) {
             state.touchingColor = payload;
         },
-        setPoemSample(state, payload) {
-            state.nextPoemSample = payload;
+        setPoemSampleMira(state, payload) {
+            state.nextPoemSampleMira = payload;
+        },
+        setPoemSampleRafal(state, payload) {
+            state.nextPoemSampleRafal = payload;
         },
         setRafalColors(state, on) {
             state.rafalColors = on;
@@ -198,11 +204,17 @@ const store = createStore({
         setTouchingColor(context, payload) {
             context.commit('setTouchingColor', payload);
         },
-        triggerPoemSentence(_, payload) {
-            socket.emit('poem', payload);
+        triggerPoemSentenceMira(_, payload) {
+            socket.emit('poem-mira', payload);
         },
-        setPoemSample(context, payload) {
-            context.commit('setPoemSample', payload);
+        triggerPoemSentenceRafal(_, payload) {
+            socket.emit('poem-rafal', payload);
+        },
+        setPoemSampleMira(context, payload) {
+            context.commit('setPoemSampleMira', payload);
+        },
+        setPoemSampleRafal(context, payload) {
+            context.commit('setPoemSampleRafal', payload);
         },
         toggleRafalColors(context) {
             if(context.getters.rafalColors === true) {
@@ -269,8 +281,11 @@ const store = createStore({
         touchingColor(state) {
             return state.touchingColor;
         },
-        nextPoemSample(state) {
-            return state.nextPoemSample;
+        nextPoemSampleMira(state) {
+            return state.nextPoemSampleMira;
+        },
+        nextPoemSampleRafal(state) {
+            return state.nextPoemSampleRafal;
         },
         rafalColors(state) {
             return state.rafalColors;
@@ -353,9 +368,12 @@ socket.on('touchcolor', (color) => {
     store.dispatch('setTouchingColor', color);
 });
 
-socket.on('poem', (message) => {
-    console.log(message);
-    store.dispatch('setPoemSample', message);
-})
+socket.on('poem-mira', (message) => {
+    store.dispatch('setPoemSampleMira', message);
+});
+
+socket.on('poem-rafal', (message) => {
+    store.dispatch('setPoemSampleRafal', message);
+});
 
 export default store;

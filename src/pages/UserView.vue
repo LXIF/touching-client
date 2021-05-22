@@ -208,7 +208,6 @@ export default {
         function startAudio() {
             noSleep.enable();
             audioIsActive.value = true;
-            document.querySelector('body').requestFullscreen();
             Tone.start()
             .then(() => {
                 console.log('tone started');
@@ -216,6 +215,7 @@ export default {
                 presenceSound();
             });
             store.dispatch('startAudio');
+            document.querySelector('body').requestFullscreen();
         }
 
         const weatherLightness = computed(() => {
@@ -229,51 +229,98 @@ export default {
 
         //////////////////POEM SAMPLES/////////////
 
-        const poemBaseUrl = '/samples/poem/';
+        const poemBaseUrlMira = '/samples/poem/mira/';
 
-        const poemSentences = [
-                '01-imagine_this_dance-bounce-1.wav_16.wav',
-                '02-happening_forever-bounce-1.wav_16.wav',
-                '03-since_always-bounce-1.wav_16.wav',
-                '04-forever-bounce-1.wav_16.wav',
-                '05-world_without_a_beginning-bounce-1.wav_16.wav',
-                '06-and_without_an_end-bounce-1.wav_16.wav',
-                '07-touching-bounce-1.wav_16.wav',
-                '08-trans-reality-bounce-1.wav_16.wav',
-                '09-entanglement-bounce-1.wav_16.wav',
-                '10-caring-bounce-1.wav_16.wav',
-                '11-mattering-bounce-1.wav_16.wav',
-                '12-in_an_endless_ecstasy_of_communication-bounce-1.wav_16.wav',
-                '13-no_void-bounce-1.wav_16.wav',
-                '14-no_self-bounce-1.wav_16.wav',
-                '15-these_are_the_days_of_miracle_and_wonder-bounce-1.wav_16.wav',
-                '16-this_is_the_long_distance_call-bounce-1.wav_16.wav',
-                '17-the_way_the_camera_follows_us_in_slomo-bounce-1.wav_16.wav',
-                '18-the_way_we_look_to_us_all-bounce-1.wav_16.wav',
-                '19-the_way_we_look_to_a_distant_constellation-bounce-1.wav_16.wav',
-                '20-thats_dying_in_a_corner_in_the_sky-bounce-1.wav_16.wav',
-                '21-these_are_the_days_of_miracle_and_wonder-bounce-2.wav_16.wav',
-                '22-and_dont_cry_baby-bounce-1.wav_16.wav',
-                '23-dont_cry-bounce-1.wav_16.wav',
-                '24-it_was_a_dry_wind-bounce-1.wav_16.wav',
-                '25-and_it_swept_across_the_desert-bounce-1.wav_16.wav',
-                '26-and_it_curled_into_the_circle_of_birth-bounce-1.wav_16.wav',
-                '27-and_the_dead_sand_falling_on_the_children-bounce-1.wav_16.wav',
-                '28-the_mothers_and_the_fathers-bounce-1.wav_16.wav',
-                '29-and_the_automatic_earth-bounce-1.wav_16.wav',
-                '30-and_i_believe-bounce-1.wav_16.wav',
-                '31-these_are_the_days_of_lasers_in_the_jungle-bounce-1.wav_16.wav',
-                '32-lasers_in_the_jungle_somewhere-bounce-1.wav_16.wav',
-                '33-staccato_signals_of_constant_information-bounce-1.wav_16.wav',
-                '34-and_baby-bounce-1.wav_16.wav',
-                '35-these_are_the_days_of_miracle_and_wonder-bounce-3.wav_16.wav',
-                '36-this_is_the_long_distance_call-bounce-2.wav_16.wav',
-                '37-this_is_about_entanglements-bounce-1.wav_16.wav',
-                '38-matter-bounce-1.wav_16.wav',
-                '39-and_meaning-bounce-1.wav_16.wav'
+        const poemSentencesMira = [
+                '01-imagine_this_dance-bounce-2.wav',
+                '02-happening_forever-bounce-2.wav',
+                '03-since_always-bounce-2.wav',
+                '04-forever-bounce-2.wav',
+                '05-world_without_a_beginning-bounce-2.wav',
+                '06-and_without_an_end-bounce-2.wav',
+                '07-touching-bounce-2.wav',
+                '08-trans-reality-bounce-2',
+                '09-entanglement-bounce-2.wav',
+                '10-caring-bounce-2.wav',
+                '11-mattering-bounce-2.wav',
+                '12-in_an_endless_ecstasy_of_communication-bounce-2.wav',
+                '13-no_void-bounce-2.wav',
+                '14-no_self-bounce-2.wav',
+                '15-these_are_the_days_of_miracle_and_wonder-bounce-2.wav',
+                '16-this_is_the_long_distance_call-bounce-2.wav',
+                '17-the_way_the_camera_follows_us_in_slomo-bounce-2.wav',
+                '18-the_way_we_look_to_us_all-bounce-2.wav',
+                '19-the_way_we_look_to_a_distant_constellation-bounce-2.wav',
+                '20-thats_dying_in_a_corner_in_the_sky-bounce-2.wav',
+                '21-these_are_the_days_of_miracle_and_wonder-bounce-2.wav',
+                '22-and_dont_cry_baby-bounce-2.wav',
+                '23-dont_cry-bounce-2.wav',
+                '24-it_was_a_dry_wind-bounce-2.wav',
+                '25-and_it_swept_across_the_desert-bounce-2.wav',
+                '26-and_it_curled_into_the_circle_of_birth-bounce-2.wav',
+                '27-and_the_dead_sand_falling_on_the_children-bounce-2.wav',
+                '28-the_mothers_and_the_fathers-bounce-2.wav',
+                '29-and_the_automatic_earth-bounce-2.wav',
+                '30-and_i_believe-bounce-2.wav',
+                '31-these_are_the_days_of_lasers_in_the_jungle-bounce-2.wav',
+                '32-lasers_in_the_jungle_somewhere-bounce-2.wav',
+                '33-staccato_signals_of_constant_information-bounce-2.wav',
+                '34-a_loose_affiliation_of_millionaires_and_billionaires-bounce-1.wav',
+                '35-and_baby-bounce-2.wav',
+                '36-these_are_the_days_of_miracle_and_wonder-bounce-2.wav',
+                '37-this_is_the_long_distance_call-bounce-2.wav',
+                '38-this_is_about_entanglements-bounce-2.wav',
+                '39-matter-bounce-2.wav',
+                '40-and_meaning-bounce-2.wav',
         ];
 
-        const poemSamplers = [];
+        const poemBaseUrlRafal = '/samples/poem/rafal/';
+
+        const poemSentencesRafal = [
+                '01_rafal_imagine_this_dance-bounce-2.wav',
+                '02_rafal_happening_forever-bounce-2.wav',
+                '03_rafal_since_always-bounce-2.wav',
+                '04_rafal_forever-bounce-2.wav',
+                '05_rafal_world_without_a_beginning-bounce-2.wav',
+                '06_rafal_and_without_an_end-bounce-2.wav',
+                '07_rafal_touching-bounce-2.wav',
+                '08_rafal_trans_reality-bounce-2.wav',
+                '09_rafal_entanglement-bounce-2.wav',
+                '10_rafal_caring-bounce-2.wav',
+                '11_rafal_mattering-bounce-2.wav',
+                '12_rafal_in_an_endless_ecstasy_of_communication-bounce-2.wav',
+                '13_rafal_no_void-bounce-2.wav',
+                '14_rafal_no_self-bounce-2.wav',
+                '15_rafal_these_are_the_days_of_miracle_and_wonder-bounce-2.wav',
+                '16_rafal_this_is_the_long_distance_call-bounce-2.wav',
+                '17_rafal_the_way_the_camera_follows_us_in_slomo-bounce-2.wav',
+                '18_rafal_the_way_we_look_to_us_all-bounce-2.wav',
+                '19_rafal_the_way_we_look_to_a_distant_constellation-bounce-2.wav',
+                '20_rafal_thats_dying_in_a_corner_in_the_sky-bounce-2.wav',
+                '21_rafal_these_are_the_days_of_miracle_and_wonder-bounce-2.wav',
+                '22_rafal_and_dont_cry_baby-bounce-2.wav',
+                '23_rafal_dont_cry-bounce-2.wav',
+                '24_rafal_it_was_a_dry_wind-bounce-2.wav',
+                '25_rafal_and_it_swept_across_the_desert-bounce-2.wav',
+                '26_rafal_and_it_curled_into_the_circle_of_birth-bounce-2.wav',
+                '27_rafal_and_the_dead_sand_falling_on_the_children-bounce-2.wav',
+                '28_rafal_the_mothers_and_the_fathers-bounce-2.wav',
+                '29_rafal_and_the_automatic_earth-bounce-2.wav',
+                '30_rafal_and_i_believe-bounce-3.wav',
+                '31_rafal_these_are_the_days_of_lasers_in_the_jungle-bounce-3.wav',
+                '32_rafal_lasers_in_the_jungle_somewhere-bounce-2.wav',
+                '33_rafal_staccato_signals_of_constant_information-bounce-2.wav',
+                '34_rafal_a_loose_affiliation_of_millionaires_and_billionaires-bounce-2.wav',
+                '35_rafal_and_baby-bounce-2.wav',
+                '36_rafal_these_are_the_days_of_miracle_and_wonder-bounce-2.wav',
+                '37_rafal_this_is_the_long_distance_call-bounce-2.wav',
+                '38_rafal_this_is_about_entanglements-bounce-2.wav',
+                '39_rafal_matter-bounce-2.wav',
+                '40_rafal_meaning-bounce-2.wav',
+        ];
+
+        const poemSamplersMira = [];
+        const poemSamplersRafal = [];
 
         const poemChorus = new Tone.Chorus(4, 2.5, 0.5);
         let poemFeedbackDelay = new Tone.FeedbackDelay(200, 0.1);
@@ -281,24 +328,46 @@ export default {
         poemChorus.connect(poemFeedbackDelay);
         poemFeedbackDelay.toDestination();
 
-        for(const sentence in poemSentences) {
+        //load mira samplers
+
+        for(const sentence in poemSentencesMira) {
             const sentenceSampler = new Tone.Sampler({
-                'C3' : poemSentences[sentence]
+                'C3' : poemSentencesMira[sentence]
             },
             () => {
                 // console.log('loaded ' + poemSentences[sentence]);
             },
-                poemBaseUrl
+                poemBaseUrlMira
             );
             sentenceSampler.connect(poemChorus);
-            poemSamplers.push(sentenceSampler);
+            poemSamplersMira.push(sentenceSampler);
         }
 
-        const nextPoemSample = computed(() => {
-            return store.getters['nextPoemSample'];
+        //load rafal samplers
+
+        for(const sentence in poemSentencesRafal) {
+            const sentenceSampler = new Tone.Sampler({
+                'C3' : poemSentencesRafal[sentence]
+            },
+            () => {
+                // console.log('loaded ' + poemSentences[sentence]);
+            },
+                poemBaseUrlRafal
+            );
+            sentenceSampler.connect(poemChorus);
+            poemSamplersRafal.push(sentenceSampler);
+            
+        }
+
+
+        /////get next sample and play
+
+        const nextPoemSampleMira = computed(() => {
+            return store.getters['nextPoemSampleMira'];
         });
 
-        watch(nextPoemSample, (newValue) => {
+        watch(nextPoemSampleMira, (newValue) => {
+
             const index = newValue.index;
             const probability = newValue.probability;
             const normalizedProbability = probability / 100;
@@ -319,22 +388,40 @@ export default {
                 playPitch = normalPitch - randomPitchAmountNormalized * maxPitchDown;
             }
             
-
-            // poemFeedbackDelay = new Tone.FeedbackDelay(Math.random() * 150 + 50, 0.3);
-
-            // console.log('randomPitch: ' + randomPitch);
-            // console.log('playPitch: ' + playPitch);
-
-
-            // const timeJitter = newValue.timeJitter;
-
-            // const playPitch = normalPitch;
-            
-
             if(normalizedProbability > randomPlayToss) {
-                poemSamplers[index-1].triggerAttack(playPitch);
+                poemSamplersMira[index-1].triggerAttack(playPitch);
             }
-        })
+        });
+
+        const nextPoemSampleRafal = computed(() => {
+            return store.getters['nextPoemSampleRafal'];
+        });
+
+        watch(nextPoemSampleRafal, (newValue) => {
+            const index = newValue.index;
+            const probability = newValue.probability;
+            const normalizedProbability = probability / 100;
+            const randomPlayToss = Math.random();
+            const normalPitch = 130;
+
+            const randomPitchAmountNormalized = newValue.randomPitch / 100;
+            const maxPitchUp = 300;
+            const maxPitchDown = 60;
+
+            const upOrDown = Math.random() > 0.5;
+            // const maxPitchFactor = 2;
+            let playPitch;
+
+            if(upOrDown) {
+                playPitch = normalPitch + randomPitchAmountNormalized * maxPitchUp;
+            } else {
+                playPitch = normalPitch - randomPitchAmountNormalized * maxPitchDown;
+            }
+            
+            if(normalizedProbability > randomPlayToss) {
+                poemSamplersRafal[index-1].triggerAttack(playPitch);
+            }
+        });
 
         ////////////ADJUST PRESENCE PARAMETERS BASED ON LOCATION//////////////
 
