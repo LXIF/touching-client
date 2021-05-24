@@ -10,6 +10,8 @@ import BaseSwipe from './components/UI/BaseSwipe'
 import ConnectionFrame from './components/UI/ConnectionFrame'
 import BaseSwiper from './components/UI/BaseSwiper'
 import BaseCheckbox from './components/UI/BaseCheckbox'
+import BaseMarquee from './components/layout/BaseMarquee'
+import MarqueeButton from './components/UI/MarqueeButton'
 
 createApp(App)
 
@@ -20,6 +22,8 @@ createApp(App)
 .component('connection-frame', ConnectionFrame)
 .component('base-swiper', BaseSwiper)
 .component('base-checkbox', BaseCheckbox)
+.component('base-marquee', BaseMarquee)
+.component('marquee-button', MarqueeButton)
 
 .use(router)
 .use(store)

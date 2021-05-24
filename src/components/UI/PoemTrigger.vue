@@ -17,22 +17,26 @@
         <base-fader v-model='probability'></base-fader>
         <label>random pitch</label>
         <base-fader v-model='randomPitch'></base-fader>
-        <label>time jitter</label>
-        <base-fader v-model='timeJitter'></base-fader>
-        <button @click='triggerSentence(sentence.index)' class='poem-button' v-for='sentence in sentences' :key='sentence.index'>{{ sentence.text }}</button>
+        <label>volume</label>
+        <base-fader v-model='volume'></base-fader>
+        <button :class='{"active": sentence.index === currentIndex}' @click='triggerSentence(sentence.index); updateIndex(sentence.index);' class='poem-button' v-for='sentence in sentences' :key='sentence.index'>{{ sentence.text }}</button>
     </div>
 </template>
 
 <script>
 export default {
-    methods: {  
+    props: ['midi-probability','midi-pitch', 'poem-trigger-buffer', 'poem-volume'],
+    methods: { 
+        updateIndex(index) {
+            this.currentIndex = index + 1;
+        },
         triggerSentence(index) {
             if(this.sourceMira) {
                 const triggerObject = {
                     index,
                     probability: this.probability,
                     randomPitch: this.randomPitch,
-                    timeJitter: this.timeJitter,
+                    volume: this.volume,
                     outputRafals: this.outputRafals,
                     outputUsers: this.outputUsers,
                     source: 'mira'
@@ -44,7 +48,7 @@ export default {
                 index,
                 probability: this.probability,
                 randomPitch: this.randomPitch,
-                timeJitter: this.timeJitter,
+                volume: this.volume,
                 outputRafals: this.outputRafals,
                 outputUsers: this.outputUsers,
                 source: 'rafal'
@@ -53,13 +57,36 @@ export default {
             }
         }
     },
+    watch: {
+        midiProbability(newValue) {
+            this.probability = newValue;
+        },
+        midiPitch(newValue) {
+            this.randomPitch = newValue;
+        },
+        poemVolume(newValue) {
+            this.volume = newValue;
+        },
+        poemTriggerBuffer(newValue) { //here we trigger new notes UwU
+            if(newValue === 127) {
+                this.triggerSentence(this.currentIndex);
+                if(this.currentIndex < 40) {
+                    this.currentIndex++;
+                } else {
+                    this.currentIndex = 1;
+                }
+            }
+        }
+    },
     data() {
         return {
-            probability: 0,
+            currentIndex: 1,
+            maxIndex: 40,
+            probability: 100,
             randomPitch: 0,
-            timeJitter: 0,
+            volume: 100,
             outputRafals: true,
-            outputUsers: false,
+            outputUsers: true,
             sourceMira: true,
             sourceRafal: false,
             sentences: [
@@ -270,7 +297,7 @@ export default {
                 {
                     index: 35,
                     text: 'and baby',
-                    miraPath: '35-and_baby-bounce-1.wav_16.wav',
+                    miraPath: '35-and_baby-bounce-2.wav',
                     rafalPath: '35_rafal_and_baby-bounce-2.wav'
                 },
                 {
@@ -331,5 +358,6 @@ export default {
         height 50px
         border-radius 50px
 
-
+    .active
+        background red
 </style>

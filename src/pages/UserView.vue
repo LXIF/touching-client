@@ -4,10 +4,14 @@
          :show='pleaseTouch'
          text='swipe right to be touching'
          @swipe='respondTouch'></base-swipe>
-        <div class='welcome' v-if='!audioIsActive'>
-            <h3>Do you allow your phone to be in touch for the duration of this performance? No data will be collected.</h3>
-            <button @click='startAudio'>YES</button>
-        </div>
+         <base-marquee :text='marqueeText' svg-id='touchme'></base-marquee>
+         <transition name='welcome-transition'>
+             <div class='welcome' v-if='!audioIsActive'>
+                <h3 lang="en" class='call-to-connect'><span class='title'>Welcome to Touching!</span> <br><br>Do you allow your phone to be in touch for the duration of this performance? No data will be collected.</h3>
+                <marquee-button class='yes-button' @click='startAudio' text='YES' />
+            </div>
+            <h3 v-else lang="en" class='now-touching'>We are now touching. Thank you. Please keep this page open.</h3>
+         </transition>
         <!-- <base-swipe :show='!audioIsActive' text='swipe right to be touching' @pointerdown='startAudio'></base-swipe> -->
         <color-screen id='touchization-display'
             v-if="usersColors"
@@ -40,7 +44,6 @@ import { useStore, mapGetters } from 'vuex';
 import { computed, watch, ref } from 'vue';
 
 import * as Tone from 'tone';
-import NoSleep from 'nosleep.js'
 
 export default {
     setup() {
@@ -62,8 +65,6 @@ export default {
         }
 
         // const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
-
-        let noSleep = new NoSleep();
 
 
         ////////////Presence Synth///////////
@@ -180,7 +181,7 @@ export default {
 
 
 
-        //////////WEATHER SYNTHS/////////
+        //////////WEATHER SYNTH/////////
 
 
         
@@ -197,16 +198,156 @@ export default {
 
         const noiseVolume = new Tone.Volume();
         noiseVolume.mute = true;
+
+        const convolverScreech = new Tone.Convolver("/samples/IR/screech.wav");
+        const convolverSnarl = new Tone.Convolver("/samples/IR/snarl.wav");
+        const screechVolume = new Tone.Volume();
+        const snarlVolume = new Tone.Volume();
+        const bitcrusher = new Tone.BitCrusher(8);
+
+        convolverSnarl.wet = 0;
+        convolverScreech.wet = 0;
+        bitcrusher.wet.value = 0
         
         // connect the noise
-        noise.chain(autoFilter, noiseVolume, Tone.Destination);
+        noise.fan(
+            autoFilter,
+            convolverScreech,
+            convolverSnarl,
+        );
+        convolverScreech.connect(screechVolume);
+        screechVolume.connect(autoFilter);
+        convolverSnarl.connect(snarlVolume);
+        snarlVolume.connect(autoFilter);
+
+
+        autoFilter.chain(
+            bitcrusher,
+            noiseVolume,
+            Tone.Destination
+        );
         // // start the autofilter LFO
         // autoFilter.start();
+
+        //ADJUST WEATHER PARAMETERS BASED ON LOCATION
+
+        const weatherLightness = computed(() => {
+            const inputLightness = weather.value.lightness;
+            
+            // const randomValue = Math.random() * 10;
+            return inputLightness
+        });
+        const weatherSnarl = computed(() => {
+            const inputSnarl = weather.value.snarl;
+            
+            // const randomValue = Math.random() * 10;
+            return inputSnarl
+        });
+        const weatherScreech = computed(() => {
+            const inputScreech = weather.value.screech;
+            
+            // const randomValue = Math.random() * 10;
+            return inputScreech
+        });
+
+        const weatherFrequency = computed(() => {
+            const inputFrequency = weather.value.frequency;
+            const randomValue = Math.random() * weather.value.frequencyRandom;
+
+            return inputFrequency + randomValue;
+        });
+
+        const weatherBaseFrequency = computed(() => {
+            const inputBaseFrequency = weather.value.baseFrequency;
+            
+            const randomValue = Math.random() * weather.value.baseFrequencyRandom;
+            return inputBaseFrequency + randomValue
+        }); 
+
+        const weatherOctaves = computed(() => {
+            const inputOctaves = weather.value.octaves;
+            
+            const randomValue = Math.random() * weather.value.octavesRandom;
+            return inputOctaves + randomValue
+        }); 
+
+        const weatherType = computed(() => {
+            const inputType = weather.value.type;
+            
+            
+            return inputType
+        });
+        const bitWet = computed(() => {
+            const inputBitWet = weather.value.bitWet;
+            
+            
+            return inputBitWet
+        });
+        const bitBits = computed(() => {
+            const inputBitBits = weather.value.bitBits + 1;
+            
+            
+            return inputBitBits
+        });
+
+
+        watch(weatherLightness, (newValue) => {
+            if(newValue <= 10) {
+                noiseVolume.mute = true;
+                noiseVolume.volume.value = -100;
+            } else {
+                noiseVolume.mute = false;
+                noiseVolume.volume.value = 0 - (100 - newValue);
+                // synthFreqShift.frequency.value = newValue * 3;
+            }
+        });
+        watch(weatherSnarl, (newValue) => {
+            snarlVolume.volume.value = 10 - (100 - newValue);
+
+        });
+        watch(weatherScreech, (newValue) => {
+            screechVolume.volume.value = 10 - (100 - newValue);
+        });
+        watch(weatherFrequency, (newValue) => {
+            autoFilter.frequency.value = newValue;
+        });
+        watch(weatherBaseFrequency, (newValue) => {
+            // console.log(newValue);
+
+            autoFilter.baseFrequency = newValue;
+        });
+        watch(weatherOctaves, (newValue) => {
+            // console.log(newValue);
+  
+            autoFilter.octaves = newValue;
+        });
+        watch(weatherType, (newValue) => {
+            // console.log(newValue);
+            autoFilter.type = newValue;
+
+        });
+        watch(bitWet, (newValue) => {
+            // console.log(newValue);
+            bitcrusher.wet.value = newValue;
+      
+        });
+        watch(bitBits, (newValue) => {
+            // console.log(newValue);
+            bitcrusher.bits.value = newValue;
+  
+        });
+
+        ////////////////FINAL SYNTH///////////////
+
+
+
+
+
+
 
         const audioIsActive = ref(false);
 
         function startAudio() {
-            noSleep.enable();
             audioIsActive.value = true;
             Tone.start()
             .then(() => {
@@ -217,15 +358,6 @@ export default {
             store.dispatch('startAudio');
             document.querySelector('body').requestFullscreen();
         }
-
-        const weatherLightness = computed(() => {
-            const inputLightness = weather.value.lightness;
-            
-            // const randomValue = Math.random() * 10;
-            return inputLightness
-        }); 
-
-
 
         //////////////////POEM SAMPLES/////////////
 
@@ -239,7 +371,7 @@ export default {
                 '05-world_without_a_beginning-bounce-2.wav',
                 '06-and_without_an_end-bounce-2.wav',
                 '07-touching-bounce-2.wav',
-                '08-trans-reality-bounce-2',
+                '08-trans-reality-bounce-2.wav',
                 '09-entanglement-bounce-2.wav',
                 '10-caring-bounce-2.wav',
                 '11-mattering-bounce-2.wav',
@@ -265,7 +397,7 @@ export default {
                 '31-these_are_the_days_of_lasers_in_the_jungle-bounce-2.wav',
                 '32-lasers_in_the_jungle_somewhere-bounce-2.wav',
                 '33-staccato_signals_of_constant_information-bounce-2.wav',
-                '34-a_loose_affiliation_of_millionaires_and_billionaires-bounce-1.wav',
+                '34-a_loose_affiliation_of_millionaires_and_billionaires-bounce-2.wav',
                 '35-and_baby-bounce-2.wav',
                 '36-these_are_the_days_of_miracle_and_wonder-bounce-2.wav',
                 '37-this_is_the_long_distance_call-bounce-2.wav',
@@ -324,18 +456,23 @@ export default {
 
         const poemChorus = new Tone.Chorus(4, 2.5, 0.5);
         let poemFeedbackDelay = new Tone.FeedbackDelay(200, 0.1);
+        const poemVolume = new Tone.Volume();
 
         poemChorus.connect(poemFeedbackDelay);
-        poemFeedbackDelay.toDestination();
+        poemFeedbackDelay.connect(poemVolume)
+        poemVolume.toDestination();
 
         //load mira samplers
 
         for(const sentence in poemSentencesMira) {
+            console.log(sentence);
+            console.log(poemSentencesMira[sentence]);
             const sentenceSampler = new Tone.Sampler({
                 'C3' : poemSentencesMira[sentence]
             },
             () => {
-                // console.log('loaded ' + poemSentences[sentence]);
+                
+                console.log('loaded ' + poemSentencesMira[sentence]);
             },
                 poemBaseUrlMira
             );
@@ -370,6 +507,7 @@ export default {
 
             const index = newValue.index;
             const probability = newValue.probability;
+            const volume = newValue.volume;
             const normalizedProbability = probability / 100;
             const randomPlayToss = Math.random();
             const normalPitch = 130;
@@ -389,6 +527,9 @@ export default {
             }
             
             if(normalizedProbability > randomPlayToss) {
+                poemFeedbackDelay.delayTime.value = 0.001 * (50 + Math.random()*950);
+                poemFeedbackDelay.feedback.value = 0.01 + Math.random() * 0.2;
+                poemVolume.volume.value = 30 - (100 - volume/2);
                 poemSamplersMira[index-1].triggerAttack(playPitch);
             }
         });
@@ -400,6 +541,7 @@ export default {
         watch(nextPoemSampleRafal, (newValue) => {
             const index = newValue.index;
             const probability = newValue.probability;
+            const volume = newValue.volume;
             const normalizedProbability = probability / 100;
             const randomPlayToss = Math.random();
             const normalPitch = 130;
@@ -419,20 +561,12 @@ export default {
             }
             
             if(normalizedProbability > randomPlayToss) {
-                poemSamplersRafal[index-1].triggerAttack(playPitch);
-            }
-        });
-
-        ////////////ADJUST PRESENCE PARAMETERS BASED ON LOCATION//////////////
-
-        watch(weatherLightness, (newValue) => {
-            if(newValue <= 10) {
-                noiseVolume.mute = true;
-                noiseVolume.volume.value = -100;
-            } else {
-                noiseVolume.mute = false;
-                noiseVolume.volume.value = 0 - (100 - newValue);
-                // synthFreqShift.frequency.value = newValue * 3;
+                try {
+                    poemVolume.volume.value = 30 - (100 - volume);
+                    poemSamplersRafal[index-1].triggerAttack(playPitch);
+                } catch (error) {
+                    console.log(error);
+                }
             }
         });
 
@@ -448,7 +582,7 @@ export default {
         }
     },
     components: {
-        ColorScreen
+        ColorScreen,
     },
     computed: {
         ...mapGetters(['pleaseTouch']),
@@ -463,6 +597,13 @@ export default {
         },
         usersColors() {
             return this.$store.getters['usersColors']
+        },
+        marqueeText() {
+            if(this.audioIsActive) {
+                return 'WE ARE NOW TOUCHING '
+            } else {
+                return 'TOUCH ME TOUCH ME TOUCH ME '
+            }
         }
     },
     methods: {
@@ -477,27 +618,86 @@ export default {
     .welcome
         height 100vh
         width 100vw
-        background #0f0
+        background linear-gradient(#93f7f5, #B4F793)
         color #000
         position fixed
         top 0
         left 0
-        padding 30px
+        // padding 50px
         box-sizing border-box
+        display grid
+        grid-template-rows 1fr 10fr
 
-    h3
-        font-size 2rem
+    .call-to-connect
+        font-size 3.2vh
         text-align center
+        font-family Messapia-Regular
+        hyphens auto
+        margin 0
+        grid-row 1/2
+        padding 50px
 
-    button
+    .welcome-transition-enter-from
+        opacity 0
+        transform scale(0.5)
+    .welcome-transition-enter-to
+        opacity 1
+        transform scale(1)
+    .welcome-transition-enter-active
+        transition all 0.5s ease-out
+    .welcome-transition-leave-from
+        opacity 1
+        transform scale(1)
+    .welcome-transition-leave-to
+        opacity 0
+        transform scale(2)
+    .welcome-transition-leave-active
+        transition all 0.5s ease-in
+
+    .yes-button
+        justify-self center
+
+    .now-touching
+        font-size 4vh
+        text-align center
+        font-family Messapia-Regular
+        hyphens auto
+        padding 50px
         position fixed
-        bottom 10vw
-        left 10vw
-        height 40vw
-        width 40vw
-        border none
-        font-size 7rem
-        border-radius 100%
-        max-width 400px
-        max-height 400px
+        top 20vh
+        animation wiggle 10s infinite
+
+    .title {
+        font-size 4vh
+        text-shadow: 0 0 20px white,
+                    0 0 20px white,
+                    0 0 20px white;
+    }
+    @keyframes wiggle {
+        0% {
+            transform: rotate(0deg);
+        }
+        33% {
+            transform: rotate(10deg);
+        }
+        66% {
+            transform: rotate(-10deg);
+        }
+        100% {
+            transform: rotate(0deg);
+        }
+    }
+
+    
+    //     // position fixed
+    //     // bottom 10vw
+    //     // left 10vw
+    //     height 100%
+    //     width 100%
+    //     border none
+    //     font-size 7rem
+    //     border-radius 100%
+    //     max-width 400px
+    //     max-height 400px
+        // grid-row 2/3
 </style>

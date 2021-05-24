@@ -75,7 +75,7 @@ export default {
         transition all 0.1s ease-in
 </style>
 
-<style lang="stylus">
+<style lang="stylus" scoped>
     @keyframes heartbeat {
         0% {
             transform: scale(0.99);

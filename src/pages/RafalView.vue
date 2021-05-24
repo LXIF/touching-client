@@ -210,7 +210,7 @@ export default {
 
         //////////////////POEM SAMPLES/////////////
 
-        const poemBaseUrlMira = '/samples/poem/mira/';
+       const poemBaseUrlMira = '/samples/poem/mira/';
 
         const poemSentencesMira = [
                 '01-imagine_this_dance-bounce-2.wav',
@@ -220,7 +220,7 @@ export default {
                 '05-world_without_a_beginning-bounce-2.wav',
                 '06-and_without_an_end-bounce-2.wav',
                 '07-touching-bounce-2.wav',
-                '08-trans-reality-bounce-2',
+                '08-trans-reality-bounce-2.wav',
                 '09-entanglement-bounce-2.wav',
                 '10-caring-bounce-2.wav',
                 '11-mattering-bounce-2.wav',
@@ -246,7 +246,7 @@ export default {
                 '31-these_are_the_days_of_lasers_in_the_jungle-bounce-2.wav',
                 '32-lasers_in_the_jungle_somewhere-bounce-2.wav',
                 '33-staccato_signals_of_constant_information-bounce-2.wav',
-                '34-a_loose_affiliation_of_millionaires_and_billionaires-bounce-1.wav',
+                '34-a_loose_affiliation_of_millionaires_and_billionaires-bounce-2.wav',
                 '35-and_baby-bounce-2.wav',
                 '36-these_are_the_days_of_miracle_and_wonder-bounce-2.wav',
                 '37-this_is_the_long_distance_call-bounce-2.wav',
@@ -305,18 +305,23 @@ export default {
 
         const poemChorus = new Tone.Chorus(4, 2.5, 0.5);
         let poemFeedbackDelay = new Tone.FeedbackDelay(200, 0.1);
+        const poemVolume = new Tone.Volume();
 
         poemChorus.connect(poemFeedbackDelay);
-        poemFeedbackDelay.toDestination();
+        poemFeedbackDelay.connect(poemVolume)
+        poemVolume.toDestination();
 
         //load mira samplers
 
         for(const sentence in poemSentencesMira) {
+            console.log(sentence);
+            console.log(poemSentencesMira[sentence]);
             const sentenceSampler = new Tone.Sampler({
                 'C3' : poemSentencesMira[sentence]
             },
             () => {
-                // console.log('loaded ' + poemSentences[sentence]);
+                
+                console.log('loaded ' + poemSentencesMira[sentence]);
             },
                 poemBaseUrlMira
             );
@@ -351,6 +356,7 @@ export default {
 
             const index = newValue.index;
             const probability = newValue.probability;
+            const volume = newValue.volume;
             const normalizedProbability = probability / 100;
             const randomPlayToss = Math.random();
             const normalPitch = 130;
@@ -370,6 +376,7 @@ export default {
             }
             
             if(normalizedProbability > randomPlayToss) {
+                poemVolume.volume.value = 0 - (100 - volume/2);
                 poemSamplersMira[index-1].triggerAttack(playPitch);
             }
         });
@@ -381,6 +388,7 @@ export default {
         watch(nextPoemSampleRafal, (newValue) => {
             const index = newValue.index;
             const probability = newValue.probability;
+            const volume = newValue.volume;
             const normalizedProbability = probability / 100;
             const randomPlayToss = Math.random();
             const normalPitch = 130;
@@ -400,7 +408,12 @@ export default {
             }
             
             if(normalizedProbability > randomPlayToss) {
-                poemSamplersRafal[index-1].triggerAttack(playPitch);
+                try {
+                    poemVolume.volume.value = 0 - (100 - volume);
+                    poemSamplersRafal[index-1].triggerAttack(playPitch);
+                } catch (error) {
+                    console.log(error);
+                }
             }
         });
 

@@ -27,7 +27,18 @@ const store = createStore({
                 hue: 0,
                 saturation: 0,
                 lightness: 0,
-                alpha: 0
+                alpha: 0,
+                frequency: 10,
+                baseFrequency: 10,
+                octaves: 10,
+                frequencyRandom: 1,
+                baseFrequencyRandom: 1,
+                octavesRandom: 1,
+                type: 'square',
+                screech: 0,
+                snarl: 0,
+                bitWet: 0,
+                bitBits: 7
             },
             touchizationOngoing: false,
             users: [],
@@ -305,7 +316,7 @@ socket.on('connect', () => {
         touching: store.getters['isTouching'],
         audioStarted: store.getters['audioStarted'],
     };
-    console.log(howdyMessage);
+    // console.log(howdyMessage);
     socket.emit('howdy', howdyMessage);
 });
 
