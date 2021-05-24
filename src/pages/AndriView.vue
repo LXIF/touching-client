@@ -174,7 +174,11 @@ export default {
                 .then(onMIDISuccess, onMIDIFailure);
         }
 
-        allowMIDIAccess();
+        try {
+            allowMIDIAccess();
+        } catch(err) {
+            console.log(err);
+        }
 
         function onMIDIFailure() {
             console.log('Could not access your MIDI devices.');

@@ -15,7 +15,7 @@
                 lang="en"
                 class='now-touching'
                 @pointerdown='testTone'
-                >We are now touching. Thank you. Please keep this page open.</h3>
+                >We are now touching. Thank you. Please keep this page open - you can lock your phone and put it away though.</h3>
          </transition>
         <!-- <base-swipe :show='!audioIsActive' text='swipe right to be touching' @pointerdown='startAudio'></base-swipe> -->
         <color-screen id='touchization-display'
@@ -217,7 +217,7 @@ export default {
 
         convolverSnarl.wet = 0;
         convolverScreech.wet = 0;
-        bitcrusher.wet.value = 0
+        bitcrusher.wet.value = 0;
         
         // connect the noise
         noise.fan(
@@ -351,7 +351,8 @@ export default {
         const testSynth = new Tone.Synth().toDestination();
 
         function testTone() {
-            testSynth.triggerAttackRelease("C4","8n");
+            const randomFrequency = 300 + Math.random() * 500;
+            testSynth.triggerAttackRelease(randomFrequency,"8n");
         }
 
 
@@ -519,6 +520,8 @@ export default {
             return store.getters['nextPoemSampleMira'];
         });
 
+        const maxPoemVolume = 20;
+
         watch(nextPoemSampleMira, (newValue) => {
 
             const index = newValue.index;
@@ -545,7 +548,7 @@ export default {
             if(normalizedProbability > randomPlayToss) {
                 poemFeedbackDelay.delayTime.value = 0.001 * (50 + Math.random()*950);
                 poemFeedbackDelay.feedback.value = 0.01 + Math.random() * 0.2;
-                poemVolume.volume.value = 30 - (100 - volume/2);
+                poemVolume.volume.value = maxPoemVolume - (100 - volume);
                 poemSamplersMira[index-1].triggerAttack(playPitch);
             }
         });
@@ -578,7 +581,7 @@ export default {
             
             if(normalizedProbability > randomPlayToss) {
                 try {
-                    poemVolume.volume.value = 30 - (100 - volume);
+                    poemVolume.volume.value = maxPoemVolume - (100 - volume);
                     poemSamplersRafal[index-1].triggerAttack(playPitch);
                 } catch (error) {
                     console.log(error);
@@ -675,7 +678,7 @@ export default {
         justify-self center
 
     .now-touching
-        font-size 4vh
+        font-size 3.8vh
         text-align center
         font-family Messapia-Regular
         hyphens auto

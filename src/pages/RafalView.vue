@@ -16,12 +16,12 @@
 <script>
 import ColorScreen from '../components/user/ColorScreen';
 
-import { useStore} from 'vuex';
+import { useStore } from 'vuex';
 import { computed, watch, ref } from 'vue';
 
 import * as Tone from 'tone';
 //maybe add a nosleep to rafal
-import NoSleep from 'nosleep.js'
+import NoSleep from 'nosleep.js';
 
 export default {
     setup() {
@@ -352,6 +352,8 @@ export default {
             return store.getters['nextPoemSampleMira'];
         });
 
+        const maxPoemVolume = 20;
+
         watch(nextPoemSampleMira, (newValue) => {
 
             const index = newValue.index;
@@ -376,7 +378,7 @@ export default {
             }
             
             if(normalizedProbability > randomPlayToss) {
-                poemVolume.volume.value = 0 - (100 - volume/2);
+                poemVolume.volume.value = maxPoemVolume - (100 - volume);
                 poemSamplersMira[index-1].triggerAttack(playPitch);
             }
         });
@@ -409,7 +411,7 @@ export default {
             
             if(normalizedProbability > randomPlayToss) {
                 try {
-                    poemVolume.volume.value = 0 - (100 - volume);
+                    poemVolume.volume.value = maxPoemVolume - (100 - volume);
                     poemSamplersRafal[index-1].triggerAttack(playPitch);
                 } catch (error) {
                     console.log(error);
