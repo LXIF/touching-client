@@ -10,7 +10,12 @@
                 <h3 lang="en" class='call-to-connect'><span class='title'>Welcome to Touching!</span> <br><br>Do you allow your phone to be in touch for the duration of this performance? No data will be collected.</h3>
                 <marquee-button class='yes-button' @click='startAudio' text='YES' />
             </div>
-            <h3 v-else lang="en" class='now-touching'>We are now touching. Thank you. Please keep this page open.</h3>
+            <h3
+                v-else
+                lang="en"
+                class='now-touching'
+                @pointerdown='testTone'
+                >We are now touching. Thank you. Please keep this page open.</h3>
          </transition>
         <!-- <base-swipe :show='!audioIsActive' text='swipe right to be touching' @pointerdown='startAudio'></base-swipe> -->
         <color-screen id='touchization-display'
@@ -22,12 +27,14 @@
         <color-screen id='presence-display'
             :lightness='presenceLightness'
             :alpha='presenceLightness'
+            @pointerdown='testTone'
         />
         <color-screen id='weather-display'
             :lightness='weather.lightness'
             :hue='weather.hue'
             :saturation='weather.saturation'
             :alpha='weather.alpha'
+            @pointerdown='testTone'
         />
         <connection-frame></connection-frame>
         
@@ -44,11 +51,14 @@ import { useStore, mapGetters } from 'vuex';
 import { computed, watch, ref } from 'vue';
 
 import * as Tone from 'tone';
+import NoSleep from 'nosleep.js'
+
 
 export default {
     setup() {
         console.log('setup');
         const store = useStore();
+        let noSleep = new NoSleep();
 
         // const touchRequested = computed(() => store.getters.getTouchRequested);
         // function sendTouch() {
@@ -337,7 +347,12 @@ export default {
   
         });
 
-        ////////////////FINAL SYNTH///////////////
+        ////////////////TEST SYNTH///////////////
+        const testSynth = new Tone.Synth().toDestination();
+
+        function testTone() {
+            testSynth.triggerAttackRelease("C4","8n");
+        }
 
 
 
@@ -356,6 +371,7 @@ export default {
                 presenceSound();
             });
             store.dispatch('startAudio');
+            noSleep.enable();
             document.querySelector('body').requestFullscreen();
         }
 
@@ -576,6 +592,7 @@ export default {
             presenceLightness,
             weather,
             audioIsActive,
+            testTone
             // touchRequested,
             // sendTouch
             // presenceLightnessJittered
@@ -666,6 +683,7 @@ export default {
         position fixed
         top 20vh
         animation wiggle 10s infinite
+        user-select none
 
     .title {
         font-size 4vh
