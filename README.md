@@ -1,4 +1,5 @@
 # touching-client
+Very old version of the client side of a web app that uses connected phones as a musical instrument. Not maintained.
 
 ## Project setup
 ```
